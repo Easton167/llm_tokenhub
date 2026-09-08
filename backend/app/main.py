@@ -15,9 +15,12 @@
 """
 
 from contextlib import asynccontextmanager
+from sqlalchemy import text
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
+import redis.asyncio as redis_asyncio
 
 from app.api.auth import router as auth_router
 from app.api.admin.router import admin_router
@@ -34,6 +37,7 @@ from app.core.config import settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import configure_logging
 from app.core.metrics import metrics_payload
+from app.db.session import get_db
 from app.db.session import close_db
 from app.middleware.request_id import RequestIdMiddleware
 
@@ -94,6 +98,25 @@ def create_app() -> FastAPI:
     async def health() -> dict[str, str]:
         """进程探活。不查库、不查 Redis，避免把依赖故障误报成进程挂了。"""
         return {"status": "ok"}
+    
+    @app.get("/health/db")
+    async def health_db(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+        """数据库探活。"""
+        try:
+            await db.execute(text("SELECT 1"))
+            return {"status": "ok"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+    @app.get("/health/redis")
+    async def health_redis() -> dict[str, str]:
+        """Redis探活。"""
+        try:
+            client = redis_asyncio.from_url(settings.redis_url, socket_connect_timeout=0.5, socket_timeout=0.5)
+            await client.ping()
+            return {"status": "ok"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
 
     @app.get("/metrics")
     async def metrics() -> Response:
