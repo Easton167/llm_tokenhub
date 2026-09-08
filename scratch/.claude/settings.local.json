@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m try_depends:app --port 8001)",
+      "Bash(echo \"---exit:$?---\")",
+      "Bash(python -c \"import uvicorn; print\\('uvicorn', uvicorn.__version__\\)\")"
+    ]
+  }
+}

@@ -1,0 +1,190 @@
+"""全站共用的状态与枚举常量。
+
+不要在业务代码里散落魔法字符串。新增状态时：
+  1. 这里加常量 + 元组（供校验 in XXX_STATUSES）
+  2. ORM CheckConstraint / Pydantic Literal 与这里对齐
+  3. 文档/前端 STATUS_MAP 同步（尤其是会进 UI 的中文文案）
+
+``STATUS_ENABLED=0 / STATUS_DISABLED=1`` 是历史约定（模型、渠道、Key、用户），
+知识库等新模块改用字符串状态机，互不混用。
+"""
+
+STATUS_ENABLED = 0
+STATUS_DISABLED = 1
+
+VISIBILITY_PUBLIC = "public"
+VISIBILITY_ROLE_RESTRICTED = "role_restricted"
+
+# 模型类型（models.model_type）
+MODEL_TYPE_CHAT = "chat"
+MODEL_TYPE_EMBEDDING = "embedding"
+MODEL_TYPES = (MODEL_TYPE_CHAT, MODEL_TYPE_EMBEDDING)
+
+API_KEY_PREFIX = "sk-"
+API_KEY_DISPLAY_PREFIX_LEN = 10
+
+BILLING_SUBJECT_PERSONAL = "personal"
+
+# 计费主体类型（决策结果）
+BILLING_SUBJECT_TYPE_PERSONAL = "personal"
+BILLING_SUBJECT_TYPE_ORG = "org"
+
+# 后台角色数据权限范围（admin_roles.data_scope）。
+# 已建模但尚未在任何查询里生效：后台目前一律全量可见，
+# 待出现按范围过滤的需求时在管理端查询层统一接入。
+DATA_SCOPE_ALL = "all"
+DATA_SCOPE_SELF = "self"
+DATA_SCOPES = (DATA_SCOPE_ALL, DATA_SCOPE_SELF)
+
+# 组织内角色（与平台 Role 正交）
+ORG_ROLE_OWNER = "owner"
+ORG_ROLE_ADMIN = "admin"
+ORG_ROLE_MEMBER = "member"
+ORG_ROLES = (ORG_ROLE_OWNER, ORG_ROLE_ADMIN, ORG_ROLE_MEMBER)
+
+# 组织余额/额度不足时的回退策略
+BILLING_FALLBACK_PERSONAL = "personal"
+BILLING_FALLBACK_DENY = "deny"
+BILLING_FALLBACKS = (BILLING_FALLBACK_PERSONAL, BILLING_FALLBACK_DENY)
+
+# 成员额度周期（UTC 锚点；none=总额度不自动重置）
+QUOTA_PERIOD_NONE = "none"
+QUOTA_PERIOD_DAILY = "daily"
+QUOTA_PERIOD_MONTHLY = "monthly"
+QUOTA_PERIODS = (QUOTA_PERIOD_NONE, QUOTA_PERIOD_DAILY, QUOTA_PERIOD_MONTHLY)
+
+# 支付单状态机：created → paid / expired / failed（终态不可回退）
+PAYMENT_STATUS_CREATED = "created"
+PAYMENT_STATUS_PAID = "paid"
+PAYMENT_STATUS_EXPIRED = "expired"
+PAYMENT_STATUS_FAILED = "failed"
+PAYMENT_STATUSES = (
+    PAYMENT_STATUS_CREATED,
+    PAYMENT_STATUS_PAID,
+    PAYMENT_STATUS_EXPIRED,
+    PAYMENT_STATUS_FAILED,
+)
+
+# 支付入账目标钱包
+PAYMENT_TARGET_PERSONAL = "personal"
+PAYMENT_TARGET_ORG = "org"
+PAYMENT_TARGETS = (PAYMENT_TARGET_PERSONAL, PAYMENT_TARGET_ORG)
+
+# 支付渠道标识
+PAYMENT_PROVIDER_MOCK = "mock"
+PAYMENT_PROVIDER_STRIPE = "stripe"
+PAYMENT_PROVIDERS = (PAYMENT_PROVIDER_MOCK, PAYMENT_PROVIDER_STRIPE)
+
+# 用量/请求来源（usage_logs.source / request_logs.source；存量行默认 api）
+USAGE_SOURCE_CHAT = "chat"
+USAGE_SOURCE_API = "api"
+USAGE_SOURCE_KB_INGEST = "kb_ingest"
+USAGE_SOURCE_KB_QUERY = "kb_query"
+USAGE_SOURCES = (
+    USAGE_SOURCE_CHAT,
+    USAGE_SOURCE_API,
+    USAGE_SOURCE_KB_INGEST,
+    USAGE_SOURCE_KB_QUERY,
+)
+
+# 知识库状态
+KB_STATUS_ACTIVE = "active"
+KB_STATUS_DISABLED = "disabled"
+KB_STATUSES = (KB_STATUS_ACTIVE, KB_STATUS_DISABLED)
+
+# 知识库文档状态机（见 docs/prd/knowledge-base.md「文档处理状态机」）
+KB_DOC_STATUS_UPLOADED = "uploaded"
+KB_DOC_STATUS_PARSING = "parsing"
+KB_DOC_STATUS_CHUNKING = "chunking"
+KB_DOC_STATUS_PENDING_EMBEDDING = "pending_embedding"
+KB_DOC_STATUS_INSUFFICIENT_BALANCE = "insufficient_balance"
+KB_DOC_STATUS_EMBEDDING = "embedding"
+KB_DOC_STATUS_READY = "ready"
+KB_DOC_STATUS_PARTIAL = "partial"
+KB_DOC_STATUS_FAILED = "failed"
+KB_DOC_STATUSES = (
+    KB_DOC_STATUS_UPLOADED,
+    KB_DOC_STATUS_PARSING,
+    KB_DOC_STATUS_CHUNKING,
+    KB_DOC_STATUS_PENDING_EMBEDDING,
+    KB_DOC_STATUS_INSUFFICIENT_BALANCE,
+    KB_DOC_STATUS_EMBEDDING,
+    KB_DOC_STATUS_READY,
+    KB_DOC_STATUS_PARTIAL,
+    KB_DOC_STATUS_FAILED,
+)
+
+# 分块向量化状态
+KB_CHUNK_EMBED_PENDING = "pending"
+KB_CHUNK_EMBED_SUCCESS = "success"
+KB_CHUNK_EMBED_FAILED = "failed"
+KB_CHUNK_EMBED_STATUSES = (
+    KB_CHUNK_EMBED_PENDING,
+    KB_CHUNK_EMBED_SUCCESS,
+    KB_CHUNK_EMBED_FAILED,
+)
+
+# 知识库处理任务类型与状态
+KB_JOB_TYPE_PARSE = "parse"
+KB_JOB_TYPE_CHUNK = "chunk"
+KB_JOB_TYPE_EMBED = "embed"
+KB_JOB_TYPE_RECHUNK = "rechunk"
+KB_JOB_TYPES = (KB_JOB_TYPE_PARSE, KB_JOB_TYPE_CHUNK, KB_JOB_TYPE_EMBED, KB_JOB_TYPE_RECHUNK)
+
+KB_JOB_STATUS_PENDING = "pending"
+KB_JOB_STATUS_RUNNING = "running"
+KB_JOB_STATUS_SUCCESS = "success"
+KB_JOB_STATUS_FAILED = "failed"
+KB_JOB_STATUS_CANCELLED = "cancelled"
+KB_JOB_STATUSES = (
+    KB_JOB_STATUS_PENDING,
+    KB_JOB_STATUS_RUNNING,
+    KB_JOB_STATUS_SUCCESS,
+    KB_JOB_STATUS_FAILED,
+    KB_JOB_STATUS_CANCELLED,
+)
+
+# 知识库支持的文件类型（扩展名 → 规范类型名）
+KB_FILE_TYPE_TXT = "txt"
+KB_FILE_TYPE_MD = "md"
+KB_FILE_TYPE_PDF = "pdf"
+KB_FILE_TYPE_DOCX = "docx"
+KB_FILE_TYPE_HTML = "html"
+KB_FILE_TYPE_CSV = "csv"
+KB_FILE_TYPE_XLSX = "xlsx"
+KB_SUPPORTED_FILE_TYPES = (
+    KB_FILE_TYPE_TXT,
+    KB_FILE_TYPE_MD,
+    KB_FILE_TYPE_PDF,
+    KB_FILE_TYPE_DOCX,
+    KB_FILE_TYPE_HTML,
+    KB_FILE_TYPE_CSV,
+    KB_FILE_TYPE_XLSX,
+)
+KB_FILE_EXT_TO_TYPE: dict[str, str] = {
+    ".txt": KB_FILE_TYPE_TXT,
+    ".md": KB_FILE_TYPE_MD,
+    ".markdown": KB_FILE_TYPE_MD,
+    ".pdf": KB_FILE_TYPE_PDF,
+    ".docx": KB_FILE_TYPE_DOCX,
+    ".html": KB_FILE_TYPE_HTML,
+    ".htm": KB_FILE_TYPE_HTML,
+    ".csv": KB_FILE_TYPE_CSV,
+    ".xlsx": KB_FILE_TYPE_XLSX,
+}
+
+# Chat RAG：未命中策略（会话级，默认 fallback）
+CHAT_MISS_STRATEGY_STRICT = "strict"
+CHAT_MISS_STRATEGY_FALLBACK = "fallback"
+CHAT_MISS_STRATEGIES = (CHAT_MISS_STRATEGY_STRICT, CHAT_MISS_STRATEGY_FALLBACK)
+
+# strict 未命中固定文案（不调用模型）
+RAG_MISS_REPLY = "知识库中未找到相关内容"
+
+# 注入分块上下文预算：min(模型上下文 × 比例, 硬上限)
+RAG_CONTEXT_BUDGET_RATIO = 0.4
+RAG_CONTEXT_BUDGET_MAX_TOKENS = 4000
+# 模型 capabilities.max_context_tokens 缺失时的默认上下文窗口
+RAG_DEFAULT_MODEL_CONTEXT_TOKENS = 8192
+# 引用摘要最大字符数
+RAG_CITATION_SUMMARY_MAX_CHARS = 200

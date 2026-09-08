@@ -1,0 +1,118 @@
+import type { ThemeConfig } from 'antd'
+
+const fontFamily =
+  '"Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+
+export const appTheme: ThemeConfig = {
+  cssVar: {},
+  hashed: false,
+  token: {
+    colorPrimary: '#0f766e',
+    colorInfo: '#0f766e',
+    colorSuccess: '#059669',
+    colorWarning: '#d97706',
+    colorError: '#e11d48',
+    colorLink: '#0f766e',
+    colorBgLayout: '#f4f5f7',
+    colorBgContainer: '#ffffff',
+    colorBgElevated: '#ffffff',
+    colorBgSpotlight: '#111827',
+    colorBorder: '#e5e7eb',
+    colorBorderSecondary: '#eef0f2',
+    colorText: '#111827',
+    colorTextSecondary: '#6b7280',
+    colorTextTertiary: '#9ca3af',
+    colorFill: '#f3f4f6',
+    colorFillSecondary: '#f8f9fb',
+    colorFillTertiary: '#f3f4f6',
+    colorFillQuaternary: '#f8f9fb',
+    borderRadius: 10,
+    borderRadiusLG: 12,
+    borderRadiusSM: 8,
+    fontFamily,
+    fontSize: 14,
+    lineWidth: 1,
+    controlHeight: 36,
+    controlHeightLG: 40,
+    controlHeightSM: 28,
+    boxShadow: 'none',
+    boxShadowSecondary: 'none',
+    boxShadowTertiary: 'none',
+  },
+  components: {
+    Layout: {
+      headerBg: '#ffffff',
+      headerHeight: 56,
+      headerPadding: '0 24px',
+      siderBg: '#ffffff',
+      bodyBg: '#f4f5f7',
+      triggerBg: '#ffffff',
+      triggerColor: '#6b7280',
+    },
+    Menu: {
+      itemBorderRadius: 8,
+      itemMarginInline: 10,
+      itemMarginBlock: 2,
+      itemPaddingInline: 12,
+      itemHeight: 40,
+      itemSelectedBg: 'rgba(15, 118, 110, 0.1)',
+      itemSelectedColor: '#0f766e',
+      itemHoverBg: 'rgba(15, 118, 110, 0.05)',
+      itemHoverColor: '#0f766e',
+      itemActiveBg: 'rgba(15, 118, 110, 0.12)',
+      itemColor: '#374151',
+      iconSize: 16,
+      activeBarBorderWidth: 0,
+    },
+    Card: {
+      headerFontSize: 15,
+      headerHeight: 52,
+      paddingLG: 20,
+      boxShadow: 'none',
+      boxShadowTertiary: 'none',
+    },
+    Button: {
+      primaryShadow: 'none',
+      defaultShadow: 'none',
+      dangerShadow: 'none',
+      fontWeight: 500,
+    },
+    Table: {
+      headerBg: '#f8f9fb',
+      headerColor: '#6b7280',
+      headerSplitColor: 'transparent',
+      rowHoverBg: '#f3faf8',
+      borderColor: '#eef0f2',
+      cellPaddingBlock: 12,
+      cellPaddingInline: 16,
+    },
+    Input: {
+      activeShadow: '0 0 0 3px rgba(15, 118, 110, 0.12)',
+      errorActiveShadow: '0 0 0 3px rgba(225, 29, 72, 0.12)',
+    },
+    Select: {
+      optionSelectedBg: 'rgba(15, 118, 110, 0.08)',
+    },
+    Tag: {
+      defaultBg: '#f3f4f6',
+      defaultColor: '#374151',
+    },
+    Tabs: {
+      inkBarColor: '#0f766e',
+      itemSelectedColor: '#0f766e',
+      itemHoverColor: '#0f766e',
+    },
+    Modal: {
+      boxShadow: '0 16px 40px rgba(17, 24, 39, 0.12)',
+    },
+    Dropdown: {
+      boxShadow: '0 8px 24px rgba(17, 24, 39, 0.1)',
+    },
+    Message: {
+      boxShadow: '0 8px 24px rgba(17, 24, 39, 0.1)',
+    },
+    Statistic: {
+      contentFontSize: 26,
+    },
+  },
+}

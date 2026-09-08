@@ -1,0 +1,76 @@
+# 后端整套依赖：PostgreSQL(pgvector) + Redis + API + kb_worker
+# 变量与应用配置共用 backend/.env（compose 既用它做插值，也注入容器）。
+# DATABASE_URL / REDIS_URL 在 environment 里显式给出，会覆盖 .env 里的本机分片配置。
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tokenhub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD 未在 .env 中设置}
+      POSTGRES_DB: ${POSTGRES_DB:-tokenhub}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tokenhub} -d ${POSTGRES_DB:-tokenhub}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?REDIS_PASSWORD 未在 .env 中设置}", "--appendonly", "yes"]
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    image: ${BACKEND_IMAGE:-llm-tokenhub-backend:latest}
+    build: .
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-tokenhub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-tokenhub}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    # 迁移放在 API 启动前跑，kb_worker 等 API healthy 后再起，避免并发迁移。
+    # 多副本时请去掉这里的 alembic，改用手动 docker compose run --rm api alembic upgrade head。
+    command: ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${API_WORKERS:-4} --proxy-headers --forwarded-allow-ips=*"]
+    ports:
+      - "${API_BIND:-127.0.0.1:8000}:8000"
+    volumes:
+      - ./data/kb_files:/app/data/kb_files
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    restart: unless-stopped
+
+  kb_worker:
+    image: ${BACKEND_IMAGE:-llm-tokenhub-backend:latest}
+    build: .
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-tokenhub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-tokenhub}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    command: ["python", "-m", "app.tasks.kb_worker", "--loop"]
+    volumes:
+      - ./data/kb_files:/app/data/kb_files
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
