@@ -221,7 +221,7 @@ models（平台对外的模型别名，如 "gpt-4o"）
 
 范围：`users`、`api_keys`、`wallets`、`wallet_transactions`、`orgs`、`org_members`、`channels`、`models`、`model_channel_map`、`billing_rules`。
 
-**不要用工具自动生成**，自动生成的图你不会看。手画或者用 mermaid 手写，画的过程才是学习。
+**不要用工具自动生成**，自动生成的图你不会看。手画或者o用 mermaid 手写，画的过程才是学习。
 
 要求：
 

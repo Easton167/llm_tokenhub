@@ -106,7 +106,7 @@ ADMIN_RESOURCES: tuple[AdminResource, ...] = (
     AdminResource(
         key="org",
         name="组织管理",
-        actions=(ACTION_VIEW, ACTION_MANAGE),
+        actions=(ACTION_VIEW, ACTION_MANAGE, ACTION_DELETE),
         api_prefixes=("/admin/orgs",),
         path="/admin/orgs",
         icon="org",

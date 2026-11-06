@@ -33,6 +33,7 @@ class ApiKey(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     last_used_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    note: Mapped[str | None] = mapped_column(String(255), nullable=True, comment="备注")
 
     user: Mapped["User"] = relationship(back_populates="api_keys")
     request_logs: Mapped[list["RequestLog"]] = relationship(back_populates="api_key")
